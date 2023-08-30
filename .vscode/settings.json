@@ -1,5 +1,6 @@
 {
     "java.project.sourcePaths": [
         "java\\javasolutions\\src\\main\\java\\com\\hackerranksolution"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
