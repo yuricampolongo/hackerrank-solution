@@ -35,4 +35,13 @@ public class FraudulentActivityNotificationsTest {
 
         assertEquals(2, activityNotifications);
     }
+
+     @Test
+    public void testForthInput(){
+        List<Integer> activities = new ArrayList<Integer>();
+        activities.addAll(List.of(2, 3, 4, 2, 3, 6));
+        int activityNotifications = FraudulentActivityNotifications.activityNotifications(activities, 3);
+
+        assertEquals(1, activityNotifications);
+    }
 }

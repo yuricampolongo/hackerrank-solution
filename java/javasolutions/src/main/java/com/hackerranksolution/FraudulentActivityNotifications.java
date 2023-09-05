@@ -1,65 +1,55 @@
 package com.hackerranksolution;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
 
 public class FraudulentActivityNotifications {
     public static int activityNotifications(List<Integer> expenditure, int d) {
-        int totalNotifications = 0;
+        int numOfNotif = 0;
+        double median;
+        PriorityQueue<Integer> max = new PriorityQueue<>();
+        PriorityQueue<Integer> min = new PriorityQueue<>(Collections.reverseOrder());
+        if (expenditure.get(0) < expenditure.get(1)) {
+            min.add(expenditure.get(0));
+            max.add(expenditure.get(1));
+        } else {
+            max.add(expenditure.get(0));
+            min.add(expenditure.get(1));
+        }
 
-        for(int i = d; i< expenditure.size(); i++) {
-            List<Integer> subList = expenditure.subList(i-d, i);
-            Integer currentExpenditure = expenditure.get(i);
-            double median = getMedian(subList);
-            if(currentExpenditure >= median * 2){
-                totalNotifications++;
+        for (int i = 2; i < expenditure.size() - 1; i++) {
+            if (expenditure.get(i) < max.peek())
+                min.add(expenditure.get(i));
+            else
+                max.add(expenditure.get(i));
+            balance(min, max);
+            if (max.size() + min.size() == d) {
+                if (min.size() == max.size())
+                    median = ((double) min.peek() + (double) max.peek()) / 2;
+                else if (min.size() > max.size())
+                    median = min.peek();
+                else
+                    median = max.peek();
+                if (expenditure.get(i + 1) >= 2 * median)
+                    numOfNotif++;
+                if (max.contains(expenditure.get(i - d + 1)))
+                    max.remove(expenditure.get(i - d + 1));
+                else
+                    min.remove(expenditure.get(i - d + 1));
             }
         }
-
-        return totalNotifications;
+        return numOfNotif;
     }
 
-    // Quick Select Algorithm
-    private static double getMedian(List<Integer> expenditures){
-        if(expenditures.size() % 2 != 0){ // get the min middle element
-            return quickSelect(expenditures, 0, expenditures.size()-1,expenditures.size()/2);
-        } else {
-            int median1 = quickSelect(new ArrayList<>(expenditures), 0, expenditures.size()-1,expenditures.size()/2);
-            int median2 = quickSelect(new ArrayList<>(expenditures), 0, expenditures.size()-1,expenditures.size()/2 - 1);
-            return (median1 + median2) / 2.0;
+    public static void balance(PriorityQueue<Integer> min, PriorityQueue<Integer> max) {
+        if (max.size() - min.size() > 1) {
+            min.add(max.peek());
+            max.remove(max.peek());
         }
-    }
-
-
-    private static int quickSelect(List<Integer> expenditures, int left, int right, int k){
-        if (left == right){
-            return expenditures.get(left);
+        if (min.size() - max.size() > 1) {
+            max.add(min.peek());
+            min.remove(min.peek());
         }
-
-        int pivotIndex = partition(expenditures, left, right);
-        if(k == pivotIndex){
-            return expenditures.get(k);
-        } else if (k < pivotIndex){
-            return quickSelect(expenditures, left, pivotIndex - 1, k);
-        } else {
-            return quickSelect(expenditures, pivotIndex + 1, right, k);
-        }
-    }
-
-    private static int partition(List<Integer> expenditures, int left, int right){
-        int pivotValue = expenditures.get(left + right / 2);
-
-        int i = left;
-        for(int j = left; j < right; j++){
-            if(expenditures.get(j) <= pivotValue){
-                Collections.swap(expenditures, i, j);
-                i++;
-            }
-        }
-
-        Collections.swap(expenditures, i, right);
-        return i;
     }
 }
-
